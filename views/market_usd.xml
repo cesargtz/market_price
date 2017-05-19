@@ -1,0 +1,45 @@
+<openerp>
+    <data>
+        <record model="ir.ui.view" id="market_usd_form_view">
+            <field name="name">market.usd.form</field>
+            <field name="model">market.usd</field>
+            <field name="arch" type="xml">
+                <form>
+                    <group col="4">
+                        <field name="exchange_rate" string="Tipo de cambio"/>
+                        <field name="date" string="Fecha"/>
+                    </group>
+                </form>
+            </field>
+        </record>
+
+            <record model="ir.ui.view" id="market_usd_tree_view">
+                <field name="name">market.usd.tree</field>
+                <field name="model">market.usd</field>
+                <field name="arch" type="xml">
+                    <tree string="Truck Internal Tree">
+                        <field name="date" string="Fecha"/>
+                        <field name="exchange_rate" string="Tipo de cambio"/>
+                    </tree>
+                </field>
+            </record>
+
+            <record model="ir.actions.act_window" id="market_usd_list_action">
+                <field name="name">Market usd</field>
+                <field name="res_model">market.usd</field>
+                <field name="view_type">form</field>
+                <field name="view_mode">tree,form</field>
+                <field name="help" type="html">
+                    <p class="oe_view_nocontent_create">Create the first exchange rate</p>
+                </field>
+            </record>
+
+
+            <menuitem
+                id="menu_action_market_usd_form"
+                name="Tipo de cambio"
+                parent="menu_group_market"
+                sequence="77"
+                action="market_usd_list_action"/>
+    </data>
+</openerp>

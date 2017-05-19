@@ -2,16 +2,13 @@
 {
     'name': "market_price",
 
-    'summary': """
-        Short (1 phrase/line) summary of the module's purpose, used as
-        subtitle on modules listing or apps.openerp.com""",
 
     'description': """
-        Long description of module's purpose
+        adds the price of the corn with the current value of the market
     """,
 
-    'author': "Your Company",
-    'website': "http://www.yourcompany.com",
+    'author': "Yecora",
+    'website': "yecora.mx",
 
     # Categories can be used to filter modules in modules listing
     # Check https://github.com/odoo/odoo/blob/master/openerp/addons/base/module/module_data.xml
@@ -24,11 +21,11 @@
 
     # always loaded
     'data': [
-        # 'security/ir.model.access.csv',
-        'templates.xml',
+        'views/market_price.xml',
+        'views/market_usd.xml',
+        'security/market_access.xml',
+        'security/ir.model.access.csv',
+        #'templates.xml',
     ],
-    # only loaded in demonstration mode
-    'demo': [
-        'demo.xml',
-    ],
+
 }
