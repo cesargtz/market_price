@@ -33,7 +33,6 @@ class market_price(models.Model):
 
     @api.one
     def banxico(self):
-        self.date = self.date
         rss_url = "http://www.banxico.org.mx/rsscb/rss?BMXC_canal=fix&BMXC_idioma=es"
         feeds = feedparser.parse(rss_url)
         for feed in feeds["items"]:
