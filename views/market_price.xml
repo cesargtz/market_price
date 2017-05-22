@@ -1,5 +1,17 @@
 <openerp>
     <data>
+        <record id="seq_type_market_price" model="ir.sequence.type">
+          <field name="name">MP REG</field>
+          <field name="code">reg_code_mp</field>
+        </record>
+
+        <record id="seq_market_price" model="ir.sequence">
+            <field name="name">reg</field>
+            <field name="code">reg_code_mp</field>
+            <field name="prefix">MP</field>
+            <field name="padding">5</field>
+        </record>
+
         <record model="ir.ui.view" id="market_price_form_view">
             <field name="name">market.price.form</field>
             <field name="model">market.price</field>
