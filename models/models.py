@@ -21,9 +21,14 @@ class market_price(models.Model):
      @api.depends('price_ton','date')
      def _compute_mx(self):
          if self.date:
-             self.usd = self.env['market.usd'].search([("date","=",self.date)],limit=1)
-             self.price_mx = self.price_ton * self.usd.exchange_rate
+            self.usd = self.env['market.usd'].search([("date","=",self.date)],limit=1)
+            self.price_mx = self.price_ton * self.usd.exchange_rate
 
+     _sql_constraints = [
+         ('not_price_mx',
+          'CHECK(price_mx > 0)',
+          "No se encontro el tipo de cambio"),
+     ]
 
 class market_price(models.Model):
     _name = 'market.usd'
@@ -50,7 +55,7 @@ class market_price(models.Model):
                                 'date':date,
                                 'exchange_rate':float(title[4:11])
         })
-        _logger.info("ok")
+        # _logger.info("ok")
 
     _sql_constraints = [
         ('date_unique',
