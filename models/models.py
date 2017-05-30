@@ -1,8 +1,7 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
 import feedparser
-import logging
-import datetime
+import logging, datetime, pytz
 
 _logger = logging.getLogger(__name__)
 #  _logger.erro()
@@ -16,6 +15,19 @@ class market_price(models.Model):
      date = fields.Date(required=True, default=fields.Date.today)
      price_ton = fields.Float(required=True)
      price_mx = fields.Float(compute="_compute_mx", store=True)
+     hour_create = fields.Char(compute="_compute_hour", store=True)
+
+     @api.one
+     @api.depends('price_ton','date')
+     def _compute_hour(self):
+        #  self.hour_create = datetime.datetime.now()
+        #  date_db = self.env['market.price'].search([("date","=",self.date)],limit=1)
+         local = pytz.timezone("America/Chihuahua")
+         utc = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),"%Y-%m-%d %H:%M")
+         local_hr = local.localize(utc,is_dst=None)
+         utc_hr = local_hr.astimezone(pytz.utc)
+         self.hour_create = utc_hr.strftime("%Y-%m-%d %H:%M")[10:16]
+         #  datetime.datetime.now().strftime("%H:%M")
 
      @api.one
      @api.depends('price_ton','date')
