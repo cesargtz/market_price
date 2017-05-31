@@ -20,10 +20,11 @@ class market_price(models.Model):
      @api.depends('price_ton','date')
      def _compute_hour(self):
          local = pytz.timezone("America/Chihuahua")
+         _logger.warning(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
          utc = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),"%Y-%m-%d %H:%M")
          local_hr = local.localize(utc,is_dst=None)
          utc_hr = local_hr.astimezone(pytz.utc)
-         self.hour_create = utc_hr.strftime("%Y-%m-%d %H:%M")[10:16]
+         self.hour_create = utc_hr.strftime("%Y-%m-%d %I:%M %Z%z")[10:16]
 
      @api.one
      @api.depends('price_ton','date')
