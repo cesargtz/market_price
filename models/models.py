@@ -11,6 +11,7 @@ class market_price(models.Model):
 
      _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'reg_code_mp'), }
 
+     name = fields.Char()
      date = fields.Date(required=True, default=fields.Date.today)
      price_ton = fields.Float(required=True)
      price_mx = fields.Float(compute="_compute_mx", store=True)
@@ -41,6 +42,10 @@ class market_price(models.Model):
 
 class market_price(models.Model):
     _name = 'market.usd'
+
+    _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'reg_code_mu'), }
+
+    name = fields.Char()
 
     date = fields.Date(required=True, default=fields.Date.today)
     exchange_rate = fields.Float()
