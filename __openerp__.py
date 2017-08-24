@@ -23,6 +23,7 @@
     'data': [
         'views/market_price.xml',
         'views/market_usd.xml',
+        'views/market_base.xml',
         'security/market_access.xml',
         'security/ir.model.access.csv',
         #'templates.xml',

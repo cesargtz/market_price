@@ -9,7 +9,7 @@
             <field name="name">reg</field>
             <field name="code">reg_code_mp</field>
             <field name="prefix">MP</field>
-            <field name="padding">5</field>
+            <field name="padding">4</field>
         </record>
 
         <record model="ir.ui.view" id="market_price_form_view">
@@ -17,6 +17,9 @@
             <field name="model">market.price</field>
             <field name="arch" type="xml">
                 <form>
+                  <group>
+                      <button name="quandl" type="object" string="Obtener" class="oe_highlight"/>
+                  </group>
                     <group col="4">
                         <field name="price_ton" string="Precio por Tonelada (USD)"/>
                         <field name="price_mx" string="Precio por Toneladas (MX)" widget="monetary" options="{'currency_field': 'company_currency_id'}"/>
@@ -31,7 +34,7 @@
                 <field name="name">market.price.tree</field>
                 <field name="model">market.price</field>
                 <field name="arch" type="xml">
-                    <tree string="Truck Internal Tree">
+                    <tree string="Truck Internal Tree" default_order="id desc">
                         <field name="date" string="Fecha"/>
                         <field name="hour_create" string="Hora"/>
                         <field name="price_ton" string="Precio por Tonelada (USD)" />
