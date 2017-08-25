@@ -33,7 +33,7 @@
       <field name="name">market.usd.tree</field>
       <field name="model">market.usd</field>
       <field name="arch" type="xml">
-        <tree string="Truck Internal Tree" default_order="date desc">
+        <tree string="Exchange rate Internal Tree" default_order="date desc">
           <field name="date" string="Fecha"/>
           <field digits="(2, 4)" name="exchange_rate" string="Tipo de cambio"/>
         </tree>

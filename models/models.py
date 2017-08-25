@@ -1,15 +1,20 @@
 # -*- coding: utf-8 -*-
 from openerp import models, fields, api
 import feedparser
-import logging, datetime, pytz, requests
+import logging
+import datetime
+import pytz
+import requests
 
 _logger = logging.getLogger(__name__)
 #  _logger.erro()
 
+
 class market_price(models.Model):
      _name = 'market.price'
 
-     _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'reg_code_mp'), }
+     _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get(
+         'ir.sequence').get(cr, uid, 'reg_code_mp'), }
 
      name = fields.Char()
      date = fields.Date(required=True, default=fields.Date.today)
@@ -18,22 +23,23 @@ class market_price(models.Model):
      hour_create = fields.Char(compute="_compute_hour", store=True)
 
      @api.one
-     @api.depends('price_ton','date')
+     @api.depends('price_ton', 'date')
      def _compute_hour(self):
          local = pytz.timezone("America/Chihuahua")
          # _logger.warning(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-         utc = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),"%Y-%m-%d %H:%M")
-         local_hr = local.localize(utc,is_dst=None)
+         utc = datetime.datetime.strptime(
+             datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "%Y-%m-%d %H:%M")
+         local_hr = local.localize(utc, is_dst=None)
          utc_hr = local_hr.astimezone(pytz.utc)
          self.hour_create = utc_hr.strftime("%Y-%m-%d %I:%M %Z%z")[10:16]
 
      @api.one
-     @api.depends('price_ton','date')
+     @api.depends('price_ton', 'date')
      def _compute_mx(self):
          if self.date:
-            self.usd = self.env['market.usd'].search([("date","=",self.date)],limit=1)
+            self.usd = self.env['market.usd'].search(
+                [("date", "=", self.date)], limit=1)
             self.price_mx = self.price_ton * self.usd.exchange_rate
-
 
      @api.one
      def quandl(self):
@@ -43,47 +49,47 @@ class market_price(models.Model):
             _logger.error("Error to get price corn to quandl")
          response = resp.json()
          if response['dataset']['dataset_code'] == "CH2018":
-            # if response['dataset']['newest_available_date'] == datetime.date.today():
+            # if response['dataset']['newest_available_date'] ==
+            # datetime.date.today():
             print (response['dataset']['newest_available_date'])
             base = self.env['market.base'].search([], order='id DESC', limit=1)
-            self.price_ton = (response['dataset']['data'][0][6] * 0.3936825) + base['base']
+            self.price_ton = (response['dataset']['data'][0][
+                              6] * 0.3936825) + base['base']
 
+     @api.model
+     def quandl_auto(self):
+         base = self.env['market.base'].search([], order='id DESC', limit=1)
+         resp = requests.get(base['url_price_corn'])
+         if resp.status_code != 200:
+            _logger.error("Error to get price corn to quandl")
+         response = resp.json()
+         if response['dataset']['dataset_code'] == "CH2018":
+            # if response['dataset']['newest_available_date'] ==
+            # datetime.date.today():
+            date = datetime.date.today()
+            base = self.env['market.base'].search([], order='id DESC', limit=1)
+            price_ton = (response['dataset']['data'][0]
+                         [6] * 0.3936825) + base['base']
+            tc = self.env['market.usd'].search(
+                [("date", "=", date)], limit=1)
+            pricemx = price_ton * tc.exchange_rate
+            local = pytz.timezone("America/Chihuahua")
+            utc = datetime.datetime.strptime(
+                datetime.datetime.now().strftime("%Y-%m-%d %H:%M"), "%Y-%m-%d %H:%M")
+            local_hr = local.localize(utc, is_dst=None)
+            utc_hr = local_hr.astimezone(pytz.utc)
+            self.env['market.price'].create({
+                                    'date': date,
+                                    'price_ton': price_ton,
+                                    'price_mx': pricemx,
+                                    'hour_create': utc_hr.strftime("%Y-%m-%d %I:%M %Z%z")[10:16]})
 
-
-    # @api.one
-    # def quandl_auto(self):
-    #     base = self.env['market.base'].search([], order='id DESC', limit=1)
-    #     resp = requests.get(base['url_price_corn'])
-    #     if resp.status_code != 200:
-    #        _logger.error("Error to get price corn to quandl")
-    #     response = resp.json()
-    #     if response['dataset']['dataset_code'] == "CH2018":
-    #        # if response['dataset']['newest_available_date'] == datetime.date.today():
-    #        date = datetime.date.today()
-    #        base = self.env['market.base'].search([], order='id DESC', limit=1)
-    #        price_ton = (response['dataset']['data'][0][6] * 0.3936825) + base['base']
-    #        tc = self.env['market.usd'].search([("date","=",self.date)],limit=1)
-    #        local = pytz.timezone("America/Chihuahua")
-    #        # _logger.warning(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"))
-    #        utc = datetime.datetime.strptime(datetime.datetime.now().strftime("%Y-%m-%d %H:%M"),"%Y-%m-%d %H:%M")
-    #        local_hr = local.localize(utc,is_dst=None)
-    #        utc_hr = local_hr.astimezone(pytz.utc)
-    #        self.env['market.base'].create({
-    #                                'date':date,
-    #                                'price_ton':price_ton,
-    #                                'price_mx':price_ton * tc.exchange_rate,
-    #                                'hour_create':utc_hr.strftime("%Y-%m-%d %I:%M %Z%z")[10:16])
-
-     _sql_constraints = [
-         ('not_price_mx',
-          'CHECK(price_mx > 0)',
-          "No se encontro el tipo de cambio"),
-     ]
 
 class market_price(models.Model):
     _name = 'market.usd'
 
-    _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'reg_code_mu'), }
+    _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get(
+        'ir.sequence').get(cr, uid, 'reg_code_mu'), }
 
     name = fields.Char()
 
@@ -106,8 +112,8 @@ class market_price(models.Model):
         for feed in feeds["items"]:
             title = feed["title"]
         self.env['market.usd'].create({
-                                'date':date,
-                                'exchange_rate':float(title[4:11])
+                                'date': date,
+                                'exchange_rate': float(title[4:11])
         })
         # _logger.info("ok")
 
@@ -121,10 +127,12 @@ class market_price(models.Model):
 class market_price(models.Model):
     _name = 'market.base'
 
-    _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get('ir.sequence').get(cr, uid, 'reg_code_mb'), }
+    _defaults = {'name': lambda obj, cr, uid, context: obj.pool.get(
+        'ir.sequence').get(cr, uid, 'reg_code_mb'), }
 
     name = fields.Char()
 
     season = fields.Char(required=True)
     base = fields.Integer(required=True, help="Currency USD")
-    url_price_corn = fields.Char(required=True, help="This url is from de page www.quandl.com that correspond to web service")
+    url_price_corn = fields.Char(
+        required=True, help="This url is from de page www.quandl.com that correspond to web service")
